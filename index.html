@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>گردونه شانس</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        h1 {
+            color: #2575fc;
+            margin-bottom: 20px;
+        }
+        
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 30px;
+        }
+        
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                #ff7676 0% 1%, #ff9a76 1% 2%, #ffbd76 2% 3%, #ffdf76 3% 4%, 
+                #eaff76 4% 5%, #b8ff76 5% 6%, #76ff8c 6% 7%, #76ffc8 7% 8%, 
+                #76ffff 8% 9%, #76c8ff 9% 10%, #768cff 10% 11%, #9a76ff 11% 12%, 
+                #c876ff 12% 13%, #ff76ff 13% 14%, #ff76c8 14% 15%, #ff768c 15% 100%
+            );
+            position: relative;
+            transition: transform 3s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+            transform: rotate(0deg);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .wheel::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 40px;
+            background-color: #ff3b3b;
+            clip-path: polygon(50% 100%, 0 0, 100% 0);
+            z-index: 10;
+        }
+        
+        .spin-btn {
+            background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+        }
+        
+        .spin-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(106, 17, 203, 0.6);
+        }
+        
+        .spin-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .result {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2575fc;
+            min-height: 36px;
+        }
+        
+        .percentage-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            z-index: 5;
+        }
+        
+        .info {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>گردونه شانس</h1>
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <div class="wheel" id="wheel">
+                <div class="percentage-label" id="percentageLabel">%</div>
+            </div>
+        </div>
+        <button class="spin-btn" id="spinBtn">چرخاندن گردونه</button>
+        <div class="result" id="result"></div>
+        <div class="info">گردونه را بچرخانید و شانس خود را امتحان کنید!</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const wheel = document.getElementById('wheel');
+            const spinBtn = document.getElementById('spinBtn');
+            const result = document.getElementById('result');
+            const percentageLabel = document.getElementById('percentageLabel');
+            
+            let isSpinning = false;
+            
+            spinBtn.addEventListener('click', function() {
+                if (isSpinning) return;
+                
+                isSpinning = true;
+                result.textContent = '';
+                
+                // محاسبه زاویه چرخش
+                // ابتدا چند دور کامل می‌چرخد
+                const fullRotations = 5 + Math.floor(Math.random() * 3);
+                
+                // سپس به یک عدد تصادفی بین 1 تا 15 می‌رسد (که همان درصد است)
+                const actualPercentage = 1 + Math.floor(Math.random() * 15);
+                
+                // محاسبه زاویه نهایی
+                // هر درصد معادل 3.6 درجه است (360/100)
+                // اما ما می‌خواهیم که نشانگر روی درصد مورد نظر قرار گیرد
+                // از آنجایی که نشانگر در بالای گردونه است، باید 90 درجه کم کنیم
+                const finalAngle = (fullRotations * 360) + (actualPercentage * 3.6) - 90;
+                
+                // چرخش گردونه
+                wheel.style.transform = `rotate(${-finalAngle}deg)`;
+                
+                // نمایش نتیجه پس از اتمام چرخش
+                setTimeout(function() {
+                    result.textContent = `شما ${actualPercentage}% برنده شدید!`;
+                    percentageLabel.textContent = `${actualPercentage}%`;
+                    isSpinning = false;
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>
